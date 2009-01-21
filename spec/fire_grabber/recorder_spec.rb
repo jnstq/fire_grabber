@@ -17,15 +17,14 @@ describe FireGrabber::Recorder do
       FireGrabber::Recorder.configuration[:dvgrab_exeutable].should eql('/path/to/dvgrab')
     end
     
-    it "should have standard setting for dvgrab executable" do
-      pending
-    end
-    
   end
 
   describe "record" do
-    it "should starts recording" do
+    
+    it "should raise error when not output file is set" do
+      @r.start!
     end
+    
   end
 
 end
