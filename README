@@ -10,6 +10,7 @@ FireGrabber::Recorder.configure do |config|
   # include both path and basename for the outgoing file. DVGrab will add number for each take.
   config.output_file = '/path/to/file'
   config.dvgrab_exeutable = '/path/to/dvgrab'
+  config.dvgrab_args = '-showstatus -noavc -f dv1'
 end
 
 recorder = FireGrabber::Recorder.new
@@ -23,6 +24,7 @@ recorder.elapsed_time # => Wed Jan 21 00:00:01 0100 2009
 recorder.filename     # => "/path/to/file001.avi"
 recorder.frames       # => 25
 recorder.size         # => 10 (MiB from dvgrab)
+recorder.timecode     # => "02:19:44.06"
 
 recorder.stop!
 recorder.recording?   # => false
