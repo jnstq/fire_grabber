@@ -52,8 +52,13 @@ module FireGrabber
     
     def elapsed_time
       return unless @started_at
-      Time.now.at_beginning_of_day + elapsed_in_seconds
+      Time.now.at_beginning_of_day + duration.seconds
     end
+    
+    def duration
+      return Time.now - @started_at unless @ended_at
+      @ended_at - @started_at
+    end        
     
     def parse(dvgrab_output)
       if dvgrab_output =~ /"([.a-zA-Z\/]*)":\s+(.*)\s+MiB\s+(\d+)\s+frames\s+timecode\s+(.*)\s+date/
@@ -98,10 +103,6 @@ module FireGrabber
       "#{configuration[:dvgrab_exeutable]} #{configuration[:dvgrab_args]} #{configuration[:output_file]} 2>&1"
     end
     
-    def elapsed_in_seconds
-      return Time.now - @started_at unless @ended_at
-      @ended_at - @started_at
-    end    
   end
 end
 
