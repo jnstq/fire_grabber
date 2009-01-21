@@ -2,6 +2,9 @@
 require 'rubygems'
 require 'activesupport'
 
+# dvgrab -showstatus -noavc -f dv1 /home/equipe/eqpvideo
+output_file = ARGV.pop || "dvgrab-001"
+
 STDOUT.sync = true
 Time::DATE_FORMATS[:timecode] = "%H:%M:%S.00"
 
@@ -10,17 +13,17 @@ Signal.trap("HUP") do
 end
 
 Signal.trap("INT") do
-  puts "Capture Stopped"
+  STDOUT.puts "Capture Stopped"
   exit
 end
 
-puts "Found AV/C device with GUID 0x006037004e545301"
-puts "Capture Started"
+STDOUT.puts "Found AV/C device with GUID 0x006037004e545301"
+STDOUT.puts "Capture Started"
 
 size, frames, timecode = 0, 0, Time.now.at_beginning_of_day
 
 loop do
-  puts %Q["dvgrab-001.dv": #{size.to_s.rjust(5)}.00 MiB #{frames.to_s.rjust(5)} frames timecode #{timecode.to_s(:timecode)} date #{Time.now.to_s(:db)}]
+  STDOUT.puts %Q["#{output_file}.avi": #{size.to_s.rjust(5)}.00 MiB #{frames.to_s.rjust(5)} frames timecode #{timecode.to_s(:timecode)} date #{Time.now.to_s(:db)}]
   timecode += 1.second
   frames += 25
   size += 1
