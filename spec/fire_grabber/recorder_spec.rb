@@ -102,7 +102,7 @@ describe FireGrabber::Recorder do
     end
 
     it "should set ended at" do
-      @r.stub!(:recording?).and_return(:true)
+      @r.stub!(:dvgrab_running?).and_return(true)
       @r.stop!
       @r.ended_at.to_s(:db).should eql(Time.now.to_s(:db))
     end

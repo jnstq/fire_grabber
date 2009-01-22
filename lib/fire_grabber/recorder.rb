@@ -34,7 +34,7 @@ module FireGrabber
 
     def start!
       raise "No output file specified" unless configuration[:output_file].present?
-      raise "Already recording" if recording?      
+      raise "Dvgrab already running" if dvgrab_running?      
       nullify_accessors!
       run_dvgrab
       capture_output
@@ -42,7 +42,7 @@ module FireGrabber
     end
 
     def stop!
-      return unless recording?
+      return unless dvgrab_running?
       kill_dvgrab
       stop_capture_output
       @ended_at = Time.now
@@ -50,6 +50,10 @@ module FireGrabber
 
     def recording?
       !! @dvgrab_pipe
+    end
+    
+    def dvgrab_running?
+      @dvgrab_pipe
     end
     
     def elapsed_time
