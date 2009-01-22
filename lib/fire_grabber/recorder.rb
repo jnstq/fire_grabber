@@ -2,6 +2,8 @@ require 'rubygems'
 require 'activesupport'
 require 'ostruct'
 
+Time::DATE_FORMATS[:timecode] = "%H:%M:%S.00"
+
 module FireGrabber
   class Recorder
     class_inheritable_hash :configuration
@@ -46,6 +48,7 @@ module FireGrabber
       kill_dvgrab
       stop_capture_output
       @ended_at = Time.now
+      attributes
     end
 
     def recording?
@@ -67,10 +70,14 @@ module FireGrabber
     end        
     
     def parse(dvgrab_output)
-      if dvgrab_output =~ /"([.a-zA-Z\/]*)":\s+(.*)\s+MiB\s+(\d+)\s+frames\s+timecode\s+(.*)\s+date/
+      if dvgrab_output =~ /"([.\w\/]*)":\s+(.*)\s+MiB\s+(\d+)\s+frames\s+timecode\s+(.*)\s+date/
         @filename, @size, @frames, @timecode = $1, $2, $3, $4
       end
     end
+    
+    def attributes
+      {:filename => @filename, :frames => @frames, :size => @size, :timecode => @timecode, :duration => (elapsed_time && elapsed_time.to_s(:timecode)) }
+    end    
 
     private
     
@@ -91,7 +98,7 @@ module FireGrabber
       @capture_output = Thread.new do
         @dvgrab_pipe.each(configuration[:line_ending]) do |line|
           line.strip!
-          if line.present?
+          if line.present?            
             logger.info(line)
             parse(line)
           end
@@ -122,8 +129,8 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   FireGrabber::Recorder.configure do |config|
-    config.dvgrab_exeutable = '/Users/jon/code/test/fire_grabber/spec/support/dvgrab'
-    config.output_file = '/path/to/file'
+    config.dvgrab_exeutable = File.expand_path("#{File.dirname(__FILE__)}/../../spec/support/dvgrab")
+    config.output_file = '/path/to/file_name/'
     config.line_ending = "\n"
   end
   

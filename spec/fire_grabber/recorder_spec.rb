@@ -10,9 +10,9 @@ describe FireGrabber::Recorder do
     end
     @r = FireGrabber::Recorder.new
   end
-  
+
   describe "logger" do
-    
+
     it "should create a logger object if log_file is specified" do
       FireGrabber::Recorder.configure do |config|
         config.log_file = 'fire_grabber.log'
@@ -85,10 +85,17 @@ describe FireGrabber::Recorder do
       end
     end
 
+    describe "status" do
+      it "should return status hash on stop" do
+        @r.start!
+        @r.stop!.should be_kind_of(Hash)
+      end
+    end
+
   end
 
   describe "elapsed time" do
-    
+
     before(:each) do
       @r.stub!(:run_dvgrab)
       @r.stub!(:kill_dvgrab)
@@ -111,13 +118,13 @@ describe FireGrabber::Recorder do
       @r.started_at = Time.now - 1.hour
       @r.elapsed_time.to_s(:time).should eql("01:00")
     end
-    
+
     it "should return elapsed time based on ended at" do
       @r.started_at = Time.now - 1.hour
       @r.ended_at = Time.now + 2.hour
       @r.elapsed_time.to_s(:time).should eql("03:00")
     end
- 
+
   end
 
   describe "parse dvgrab output" do
