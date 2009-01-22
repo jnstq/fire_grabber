@@ -20,12 +20,14 @@ module FireGrabber
       config.line_ending = "\r"      
     end
 
-    attr_accessor :filename, :frames, :size, :timecode, :started_at, :ended_at
+    attr_accessor :filename, :frames, :size, :timecode, :started_at, :ended_at, :logger
 
     def initialize
+      @logger = Logger.new(configuration[:log_file] || STDOUT)
+      @logger.datetime_format = "%Y-%m-%d %H:%M:%S"
       @dvgrab_pipe = @capture_output = nil
       Signal.trap("CHLD") do
-        puts "dvgrab proccses terminated"
+        logger.info("Dvgrab proccses terminated")
         @dvgrab_pipe = nil
       end
     end
@@ -47,7 +49,7 @@ module FireGrabber
     end
 
     def recording?
-      @dvgrab_pipe
+      !! @dvgrab_pipe
     end
     
     def elapsed_time
@@ -69,24 +71,29 @@ module FireGrabber
     private
     
     def run_dvgrab
+      logger.info("Starting #{dvgrab_command}")
       @dvgrab_pipe = IO.popen(dvgrab_command)      
     end
     
     def kill_dvgrab
-      Process.kill("HUP", @dvgrab_pipe.pid)
-      @dvgrab_pipe.close
+      logger.info("Killing dvgrab proccess #{@dvgrab_pipe.pid}")
+      Process.kill("INT", @dvgrab_pipe.pid)
+      @dvgrab_pipe.close if @dvgrab_pipe
       @dvgrab_pipe = nil      
     end
     
     def capture_output
+      logger.info("Starting capture thread")
       @capture_output = Thread.new do
         @dvgrab_pipe.each(configuration[:line_ending]) do |line|
+          logger.info(line.strip)
           parse(line)
         end
       end      
     end
     
     def stop_capture_output
+      logger.info("Stopping capture thread")
       @capture_output.kill
     end
     

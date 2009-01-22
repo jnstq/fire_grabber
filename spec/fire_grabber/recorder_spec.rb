@@ -10,6 +10,16 @@ describe FireGrabber::Recorder do
     end
     @r = FireGrabber::Recorder.new
   end
+  
+  describe "logger" do
+    
+    it "should create a logger object if log_file is specified" do
+      FireGrabber::Recorder.configure do |config|
+        config.log_file = 'fire_grabber.log'
+      end
+      FireGrabber::Recorder.new.logger.should be_kind_of(Logger)
+    end
+  end
 
   describe "settings" do
 
