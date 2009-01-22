@@ -23,7 +23,7 @@ STDOUT.puts "Capture Started"
 size, frames, timecode = 0, 0, Time.now.at_beginning_of_day
 
 loop do
-  STDOUT.puts %Q["#{output_file}.avi": #{size.to_s.rjust(5)}.00 MiB #{frames.to_s.rjust(5)} frames timecode #{timecode.to_s(:timecode)} date #{Time.now.to_s(:db)}]
+  STDOUT.puts %Q["#{output_file}.avi": #{size.to_s.rjust(5)}.00 MiB #{frames.to_s.rjust(5)} frames timecode #{timecode.to_s(:timecode)} date #{Time.now.to_s(:db)}\r]
   timecode += 1.second
   frames += 25
   size += 1

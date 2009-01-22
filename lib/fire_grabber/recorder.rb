@@ -86,8 +86,11 @@ module FireGrabber
       logger.info("Starting capture thread")
       @capture_output = Thread.new do
         @dvgrab_pipe.each(configuration[:line_ending]) do |line|
-          logger.info(line.strip)
-          parse(line)
+          line.strip!
+          if line.present?
+            logger.info(line)
+            parse(line)
+          end
         end
       end      
     end
