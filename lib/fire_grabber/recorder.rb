@@ -70,16 +70,20 @@ module FireGrabber
     end        
     
     def parse(dvgrab_output)
-      if dvgrab_output =~ /"([.\w\/]*)":\s+(.*)\s+MiB\s+(\d+)\s+frames\s+timecode\s+(.*)\s+date/
+      if dvgrab_output =~ recording_info
         @filename, @size, @frames, @timecode = $1, $2, $3, $4
       end
     end
     
     def attributes
-      {:filename => @filename, :frames => @frames, :size => @size, :timecode => @timecode, :duration => (elapsed_time && elapsed_time.to_s(:timecode)) }
+      {:filename => @filename, :started_at => @started_at, :ended_at => @ended_at, :frames => @frames, :size => @size, :timecode => @timecode, :duration => (elapsed_time && elapsed_time.to_s(:timecode)) }
     end    
 
     private
+    
+    def recording_info
+      /"([.\w\/]*)":\s+(.*)\s+MiB\s+(\d+)\s+frames\s+timecode\s+(.*)\s+date/
+    end
     
     def run_dvgrab
       logger.info("Starting #{dvgrab_command}")

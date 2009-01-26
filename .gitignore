@@ -3,3 +3,5 @@
 coverage
 examples/file_grabber.log
 file_grabber.log
+spec/fire_grabber/fire_grabber.log
+fire_grabber.log

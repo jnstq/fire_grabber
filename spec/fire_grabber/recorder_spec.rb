@@ -128,7 +128,7 @@ describe FireGrabber::Recorder do
   end
 
   describe "parse dvgrab output" do
-
+    
     it "should get filename" do
       @r.parse(%Q["/path/to/file.avi":    72.00 MiB  1800 frames timecode 00:01:12.00 date 2009-01-21 21:06:20])
       @r.filename.should eql("/path/to/file.avi")
