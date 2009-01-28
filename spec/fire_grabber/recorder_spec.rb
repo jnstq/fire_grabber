@@ -76,6 +76,18 @@ describe FireGrabber::Recorder do
       @r.stop!
       @r.should_not be_recording
     end
+    
+    it "should report if dvgrab terminated unexpected" do
+      @r.start!
+      @r.send(:kill_dvgrab)
+      @r.should be_terminated_unexpected
+    end
+    
+    it "should not report terminated unexpected" do
+      @r.start!
+      @r.stop!
+      @r.should_not be_terminated_unexpected
+    end
 
     it "should nil all attributes on start" do
       @r.instance_eval { @filename = @frames = @size = @timecode = @started_at = @ended_at = "some value" }

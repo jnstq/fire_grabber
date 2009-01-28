@@ -22,7 +22,7 @@ module FireGrabber
       config.line_ending = "\r"      
     end
 
-    attr_accessor :filename, :frames, :size, :timecode, :started_at, :ended_at, :logger
+    attr_accessor :filename, :frames, :size, :timecode, :started_at, :ended_at, :logger, :terminated_unexpected
 
     def initialize
       @logger = Logger.new(configuration[:log_file] || STDOUT)
@@ -30,6 +30,7 @@ module FireGrabber
       @dvgrab_pipe = @capture_output = nil
       Signal.trap("CHLD") do
         logger.info("Dvgrab proccses terminated")
+        @terminated_unexpected = true unless @ended_at
         @dvgrab_pipe = nil
       end
     end
@@ -45,9 +46,9 @@ module FireGrabber
 
     def stop!
       return unless dvgrab_running?
+      @ended_at = Time.now
       kill_dvgrab
       stop_capture_output
-      @ended_at = Time.now
       attributes
     end
 
@@ -57,6 +58,10 @@ module FireGrabber
     
     def dvgrab_running?
       @dvgrab_pipe
+    end
+    
+    def terminated_unexpected?
+      @terminated_unexpected
     end
     
     def elapsed_time
@@ -122,6 +127,7 @@ module FireGrabber
       @timecode = nil
       @started_at = nil
       @ended_at = nil
+      @terminated_unexpected = nil
     end
 
     def dvgrab_command
