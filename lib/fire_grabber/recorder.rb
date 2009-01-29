@@ -22,7 +22,7 @@ module FireGrabber
       config.line_ending = "\r"      
     end
 
-    attr_accessor :filename, :frames, :size, :timecode, :started_at, :ended_at, :logger, :terminated_unexpected
+    attr_accessor :filename, :frames, :size, :timecode, :started_at, :ended_at, :logger, :terminated_unexpected, :stalled
 
     def initialize
       @logger = Logger.new(configuration[:log_file] || STDOUT)
@@ -33,6 +33,7 @@ module FireGrabber
         @terminated_unexpected = true unless @ended_at
         @dvgrab_pipe = nil
       end
+      heartbeat
     end
 
     def start!
@@ -60,6 +61,10 @@ module FireGrabber
       @dvgrab_pipe
     end
     
+    def stalled?
+      @dvgrab_pipe && @stalled
+    end
+    
     def terminated_unexpected?
       @terminated_unexpected
     end
@@ -85,6 +90,17 @@ module FireGrabber
     end    
 
     private
+    
+    def heartbeat
+      @last_checked_frames = nil
+      Thread.new do
+        loop do
+          @stalled = @frames == @last_checked_frames
+          @last_checked_frames = @frames
+          sleep 1
+        end
+      end      
+    end
     
     def recording_info
       /"([.\w\/]*)":\s+(.*)\s+MiB\s+(\d+)\s+frames\s+timecode\s+(.*)\s+date/
@@ -121,6 +137,7 @@ module FireGrabber
     end
     
     def nullify_accessors!
+      @stalled = nil
       @filename = nil
       @frames = nil
       @size = nil

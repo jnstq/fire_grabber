@@ -88,6 +88,20 @@ describe FireGrabber::Recorder do
       @r.stop!
       @r.should_not be_terminated_unexpected
     end
+    
+    it "should not be stalled" do
+      @r.start!
+      @r.should_not be_stalled
+      @r.stop!
+    end
+    
+    it "should be stalled" do
+      @r.stub!(:parse)
+      @r.start!
+      sleep 1
+      @r.should be_stalled
+      @r.stop!
+    end
 
     it "should nil all attributes on start" do
       @r.instance_eval { @filename = @frames = @size = @timecode = @started_at = @ended_at = "some value" }
